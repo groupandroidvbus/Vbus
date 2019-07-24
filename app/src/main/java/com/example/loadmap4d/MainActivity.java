@@ -33,6 +33,8 @@ import java.util.List;
 
 import vn.map4d.map4dsdk.annotations.MFMarker;
 import vn.map4d.map4dsdk.annotations.MFMarkerOptions;
+import vn.map4d.map4dsdk.annotations.MFPolyline;
+import vn.map4d.map4dsdk.annotations.MFPolylineOptions;
 import vn.map4d.map4dsdk.maps.LatLng;
 import vn.map4d.map4dsdk.maps.MFSupportMapFragment;
 import vn.map4d.map4dsdk.maps.Map4D;
@@ -43,11 +45,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private static final int REQUEST_LOCATION_CODE = 69;
     private Map4D map4D;
-
-    Button viewMap3d;
-
+    private boolean polylineAdded = true;
+    private final List<LatLng> latLngList = new ArrayList<>();
+    private Boolean parthUpdated = false;
+    private MFPolyline polyline;
+    private Button viewMap3d;
     private  boolean defaultInfoWindow = true;
     private final List<MFMarker> markersList = new ArrayList<>();
+    private JSONObject jsonObject;
+    private JsonArrayRequest jsonArrayRequest;
+    private Response response;
+
 
     class CustomInfoWindowAdapter implements Map4D.InfoWindowAdapter {
 
@@ -106,6 +114,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         MFSupportMapFragment mapFragment = (MFSupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.Map4D);
         mapFragment.getMapAsync(this);
 
+        //setOnListener();
+        getSupportActionBar().setTitle("Polyline");
+
 
         //getSupportActionBar().setTitle(R.string.myLocation);
         if (!isLocationPermissionEnable()) {
@@ -120,6 +131,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 startActivity(viewMap3D);
             }
         });
+
+    }
+
+    private void createPath() {
+        latLngList.add(new LatLng(16.067218, 108.213916));
+        latLngList.add(new LatLng(16.066496, 108.210311));
+        latLngList.add(new LatLng(16.064877, 108.210397));
+        latLngList.add(new LatLng(16.059980, 108.211137));
+        latLngList.add(new LatLng(16.059516, 108.208358));
 
     }
 
@@ -142,13 +162,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void addMarkersToMap() {
         //
         final RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest("https://api.myjson.com/bins/vi7vl", new Response.Listener<JSONArray>() {
+         jsonArrayRequest = new JsonArrayRequest("https://api.myjson.com/bins/vi7vl", new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
                 if (response != null) {
                     for(int i = 0; i < response.length(); i++ ){
                         try {
-                            JSONObject jsonObject = response.getJSONObject(i);
+                            jsonObject = response.getJSONObject(i);
                             double lat = jsonObject.getDouble("Lat");
                             double lon = jsonObject.getDouble("Lon");
                             String nameMarker = jsonObject.getString("Name");
@@ -173,27 +193,67 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
         requestQueue.add(jsonArrayRequest);
-//        int numMarkersInRainbow = 5;
-//        for (int i = 0; i < numMarkersInRainbow; i++) {
-//            MFMarker marker = map4D.addMarker(new MFMarkerOptions()
-//                    .position(new LatLng(10 + 0.8 * Math.sin(i * Math.PI / (numMarkersInRainbow - 1)), 106 - 0.8 * Math.cos(i * Math.PI / (numMarkersInRainbow - 1))))
-//                    .title("Marker  " + i)
-//                    .snippet(String.format("%f", 10 + 0.8 * Math.sin(i * Math.PI / (numMarkersInRainbow - 1)))
-//                            + ", "
-//                            + String.format("%f",106 - 0.8 * Math.cos(i * Math.PI / (numMarkersInRainbow - 1)))));
-//            markersList.add(marker);
-//        }
-//        View view = createMarkerView();
-//        MFMarker markerView = map4D.addMarker(new MFMarkerOptions()
-//                .position(new LatLng(13.0006, 106.784))
-//                .title("Marker  13")
-//                .snippet(13.0006f + ", " + 106.784f)
-//                .iconView(view));
-//        markersList.add(markerView);
     }
     //Marker
+    //Remove marker
+    private void removeMarkersFromMap() {
+        for (MFMarker marker : markersList) {
+            marker.remove();
+        }
+        markersList.clear();
+    }
+    //Remove marker
 
+    //add polyline to map
+    private void addPolylineToMap() {
 
+        polyline = map4D.addPolyline(new MFPolylineOptions().add(latLngList.toArray(new LatLng[latLngList.size()]))
+                .color("#0000ff")
+                .width(8)
+                .closed(false)
+                .alpha(0.3f));
+        addMarkersToMap();
+    }
+    //add polyline to map
+
+    //remove polyline
+    private void removePolyline() {
+        polyline.remove();
+        polyline = null;
+        removeMarkersFromMap();
+    }
+    //remove polyline
+
+    //add latLng to path
+    private void addLatLngToPath () {
+        latLngList.add(new LatLng(16.058691, 108.206046));
+        latLngList.add(new LatLng(16.057866, 108.203605));
+        polyline.setPath(latLngList);
+        int size = latLngList.size();
+        LatLng latLng = latLngList.get(size - 2);
+        LatLng latLng1 = latLngList.get(size - 1);
+        markersList.add(map4D.addMarker(new MFMarkerOptions()
+                .position(latLng)
+                .title("Marker " + size ++)
+                .snippet(latLng.getLatitude() + ", " + latLng.getLongitude())));
+        markersList.add(map4D.addMarker(new MFMarkerOptions()
+                .position(latLng1)
+                .title("Marker " + size ++)
+                .snippet(latLng1.getLatitude() + ", " + latLng1.getLongitude())));
+    }
+    //add latLng to path
+    //remove latlng
+    private void removeLatLngFromPath() {
+        int size = latLngList.size();
+        latLngList.remove(size - 1);
+        latLngList.remove(size - 2);
+        polyline.setPath(latLngList);
+        markersList.get(size - 1).remove();
+        markersList.get(size - 2).remove();
+        markersList.remove(size - 1);
+        markersList.remove(size - 2);
+    }
+    //remove latlng
 
     private void requestLocationPermission(String[] permission) {
         ActivityCompat.requestPermissions(this, permission, REQUEST_LOCATION_CODE);
@@ -243,7 +303,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //                return false;
 //            }
 //        });
-
+        addPolylineToMap();
         map4D.setOnMyLocationClickListener(new Map4D.OnMyLocationClickListener() {
             @Override
             public void onMyLocationClick(Location location) {
