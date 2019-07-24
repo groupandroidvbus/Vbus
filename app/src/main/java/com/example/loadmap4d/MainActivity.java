@@ -3,7 +3,9 @@ package com.example.loadmap4d;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -31,6 +33,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import vn.map4d.map4dsdk.annotations.MFBitmapDescriptorFactory;
 import vn.map4d.map4dsdk.annotations.MFMarker;
 import vn.map4d.map4dsdk.annotations.MFMarkerOptions;
 import vn.map4d.map4dsdk.annotations.MFPolyline;
@@ -177,7 +180,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             MFMarker marker = map4D.addMarker(new MFMarkerOptions()
                                     .position(new LatLng(lat, lon ))
                                     .title("Tên trạm: " + nameMarker + "\n"+ " - ID: "+ busStopID)
+                                    .icon(MFBitmapDescriptorFactory.fromResource(R.drawable.location))
                                     .snippet("Tuyến: "+tuyenDuong));
+
                             markersList.add(marker);
                         } catch (JSONException e){
                             e.printStackTrace();
@@ -207,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //add polyline to map
     private void addPolylineToMap() {
 
-        polyline = map4D.addPolyline(new MFPolylineOptions().add(latLngList.toArray(new LatLng[latLngList.size()]))
+    map4D.addPolyline(new MFPolylineOptions().add(latLngList.toArray(new LatLng[latLngList.size()]))
                 .color("#0000ff")
                 .width(8)
                 .closed(false)
@@ -296,13 +301,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         this.map4D = map4D;
         addMarkersToMap();
         map4D.setInfoWindowAdapter(new CustomInfoWindowAdapter());
-//        map4D.setOnMyLocationButtonClickListener(new Map4D.OnMyLocationButtonClickListener() {
-//            @Override
-//            public boolean onMyLocationButtonClick() {
-//                Toast.makeText(getApplicationContext(), "My Location Button clicked", Toast.LENGTH_SHORT).show();
-//                return false;
-//            }
-//        });
         addPolylineToMap();
         map4D.setOnMyLocationClickListener(new Map4D.OnMyLocationClickListener() {
             @Override
