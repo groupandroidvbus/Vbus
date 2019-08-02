@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "499137763885",
+    "firebase_url": "https://vbusapp-fb0a9.firebaseio.com",
+    "project_id": "vbusapp-fb0a9",
+    "storage_bucket": "vbusapp-fb0a9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:499137763885:android:97f1274e714121d7",
+        "android_client_info": {
+          "package_name": "com.map4d.vbus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "499137763885-ml2u0sng9h6uiklrh0n4nj9tbnimqogp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.map4d.vbus",
+            "certificate_hash": "321a8f86ba8ac2d6d02cdd0957dd4ee4ba2f05c0"
+          }
+        },
+        {
+          "client_id": "499137763885-998vmd4f6m2a596sdncu09sjtupbdlcu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-FeuF53dneXJmhbpbx3WrE4PjWw0HauU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "499137763885-998vmd4f6m2a596sdncu09sjtupbdlcu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,4 +1,4 @@
-package com.example.loadmap4d;
+package com.map4d.vbus;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

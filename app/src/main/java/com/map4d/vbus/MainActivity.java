@@ -1,4 +1,4 @@
-package com.example.loadmap4d;
+package com.map4d.vbus;
 
 import android.Manifest;
 import android.content.Intent;
@@ -6,6 +6,9 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Build;
+import android.os.CountDownTimer;
+import android.os.Handler;
+import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -17,21 +20,28 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.text.DecimalFormat;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
+import com.map4d.vbus.R;
+import com.map4d.vbus.mode3d;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import vn.map4d.map4dsdk.annotations.MFBitmapDescriptorFactory;
+import vn.map4d.map4dsdk.annotations.MFCircle;
+import vn.map4d.map4dsdk.annotations.MFCircleOptions;
 import vn.map4d.map4dsdk.annotations.MFMarker;
 import vn.map4d.map4dsdk.annotations.MFMarkerOptions;
 import vn.map4d.map4dsdk.annotations.MFPolyline;
@@ -49,12 +59,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     Button viewMap3d;
 
+    double destance[] = new double[200];
+
     private  boolean defaultInfoWindow = true;
     private final List<MFMarker> markersList = new ArrayList<>();
 
     private List<LatLng> LatLngList = new ArrayList<>();
     private List<LatLng> LatLngNgaRe = new ArrayList<>();
     private MFPolyline polyline;
+    private MFCircle circle;
+    private TextToSpeech textToSpeech;
+    private String text = "Đụ mạ mày";
+    private Double kq;
+    private Double la1;
+    private Double lo1;
+    private Double la2;
+    private Double lo2;
+    private Double lat;
+    private Double lon;
+    private LatLng point;
+    private String[] mang = new String[200];
 
     class CustomInfoWindowAdapter implements Map4D.InfoWindowAdapter {
 
@@ -128,6 +152,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+
     }
 
     @Override
@@ -147,42 +172,42 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     //polyline: giả lập tuyến bus
     private void creatPath(){
-//        LatLngList.add(new LatLng(16.056027725183,108.17246204884));//1
-//        LatLngList.add(new LatLng(16.059193410072,108.17493374949));//2
-//        LatLngList.add(new LatLng(16.062642303564,108.17986358281));//3
-//        LatLngList.add(new LatLng(16.065368915846,108.18442832196));//4
-//        LatLngList.add(new LatLng(16.065724604956,108.18888078893));//5
-//        LatLngList.add(new LatLng(16.069164,108.191942));//6
-//        LatLngList.add(new LatLng(16.072415810515,108.19254278008));//7
-//        LatLngList.add(new LatLng(16.072333334711,108.19755314653));//8
-//        LatLngList.add(new LatLng(16.073353970365,108.20198415582));//9
-//        LatLngList.add(new LatLng(16.078842,108.211714));//10
-//        LatLngList.add(new LatLng(16.077860,108.211913));//11
-//        LatLngList.add(new LatLng(16.074977,108.212494));//12
-//        LatLngList.add(new LatLng(16.072783,108.212912));//13
-//        LatLngList.add(new LatLng(16.070504180136,108.2149773683));//14
-//        LatLngList.add(new LatLng(16.068523946288,108.21556686227));//15
-//        LatLngList.add(new LatLng(16.06803270253,108.21794118251));//16
-//        LatLngList.add(new LatLng(16.068598,108.221833));//17
-//        LatLngList.add(new LatLng(16.067115214435,108.2237093266));//18
-//        LatLngList.add(new LatLng(16.061998549605,108.2231957908));//19
-//        LatLngList.add(new LatLng(16.052831,108.218032));//20
-//        LatLngList.add(new LatLng(16.055300820364,108.22013241311));//21
-//        LatLngList.add(new LatLng(16.052918189291,108.22040663538));//22
-//        LatLngList.add(new LatLng(16.049205,108.221172));//23
-//        LatLngList.add(new LatLng(16.052585,108.237009));//24
-//        LatLngList.add(new LatLng(16.04774,108.238672));//25
-//        LatLngList.add(new LatLng(16.045417,108.239301));//26
-//        LatLngList.add(new LatLng(16.042743,108.24068));//27
-//        LatLngList.add(new LatLng(16.039723,108.242166));//28
-//        LatLngList.add(new LatLng(16.036606203452,108.24368303974));//29
-//        LatLngList.add(new LatLng(16.032571988877,108.2458822566));//30
-//        LatLngList.add(new LatLng(16.02969313753,108.24725947045));//31
-//        LatLngList.add(new LatLng(16.025458031964,108.24937736947));//32
-//        LatLngList.add(new LatLng(16.017801012594,108.25328156617));//33
-//        LatLngList.add(new LatLng(16.010588485555,108.25680757123));//34
-//        LatLngList.add(new LatLng(16.006919331911,108.258677822));//35
-//        LatLngList.add(new LatLng(16.002392,108.259765));//36
+        LatLngList.add(new LatLng(16.056027725183,108.17246204884));//1
+        LatLngList.add(new LatLng(16.059193410072,108.17493374949));//2
+        LatLngList.add(new LatLng(16.062642303564,108.17986358281));//3
+        LatLngList.add(new LatLng(16.065368915846,108.18442832196));//4
+        LatLngList.add(new LatLng(16.065724604956,108.18888078893));//5
+        LatLngList.add(new LatLng(16.069164,108.191942));//6
+        LatLngList.add(new LatLng(16.072415810515,108.19254278008));//7
+        LatLngList.add(new LatLng(16.072333334711,108.19755314653));//8
+        LatLngList.add(new LatLng(16.073353970365,108.20198415582));//9
+        LatLngList.add(new LatLng(16.078842,108.211714));//10
+        LatLngList.add(new LatLng(16.077860,108.211913));//11
+        LatLngList.add(new LatLng(16.074977,108.212494));//12
+        LatLngList.add(new LatLng(16.072783,108.212912));//13
+        LatLngList.add(new LatLng(16.070504180136,108.2149773683));//14
+        LatLngList.add(new LatLng(16.068523946288,108.21556686227));//15
+        LatLngList.add(new LatLng(16.06803270253,108.21794118251));//16
+        LatLngList.add(new LatLng(16.068598,108.221833));//17
+        LatLngList.add(new LatLng(16.067115214435,108.2237093266));//18
+        LatLngList.add(new LatLng(16.061998549605,108.2231957908));//19
+        LatLngList.add(new LatLng(16.052831,108.218032));//20
+        LatLngList.add(new LatLng(16.055300820364,108.22013241311));//21
+        LatLngList.add(new LatLng(16.052918189291,108.22040663538));//22
+        LatLngList.add(new LatLng(16.049205,108.221172));//23
+        LatLngList.add(new LatLng(16.052585,108.237009));//24
+        LatLngList.add(new LatLng(16.04774,108.238672));//25
+        LatLngList.add(new LatLng(16.045417,108.239301));//26
+        LatLngList.add(new LatLng(16.042743,108.24068));//27
+        LatLngList.add(new LatLng(16.039723,108.242166));//28
+        LatLngList.add(new LatLng(16.036606203452,108.24368303974));//29
+        LatLngList.add(new LatLng(16.032571988877,108.2458822566));//30
+        LatLngList.add(new LatLng(16.02969313753,108.24725947045));//31
+        LatLngList.add(new LatLng(16.025458031964,108.24937736947));//32
+        LatLngList.add(new LatLng(16.017801012594,108.25328156617));//33
+        LatLngList.add(new LatLng(16.010588485555,108.25680757123));//34
+        LatLngList.add(new LatLng(16.006919331911,108.258677822));//35
+        LatLngList.add(new LatLng(16.002392,108.259765));//36
 
         LatLngNgaRe.add(new LatLng(16.056027725183,108.17246204884));//1
         LatLngNgaRe.add(new LatLng(16.057422,108.172358));
@@ -264,27 +289,28 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        }
         //Marker
         final RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest("https://api.myjson.com/bins/vi7vl", new Response.Listener<JSONArray>() {
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest("https://vbusapp.000webhostapp.com", new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
                 if (response != null) {
                     for(int i = 0; i < response.length(); i++ ){
                         try {
                             JSONObject jsonObject = response.getJSONObject(i);
-                            double lat = jsonObject.getDouble("Lat");
-                            double lon = jsonObject.getDouble("Lon");
+                            lat = jsonObject.getDouble("Lat");
+                            lon = jsonObject.getDouble("Lon");
                             String nameMarker = jsonObject.getString("Name");
                             String busStopID = jsonObject.getString("BusStopId");
-                            String tuyenDuong = jsonObject.getString("PlaceNameFromName");
+                            String Route = jsonObject.getString("PlaceNameFromName");
                             MFMarker marker = map4D.addMarker(new MFMarkerOptions()
                                     .position(new LatLng(lat, lon ))
                                     .title("Tên trạm: " + nameMarker + "\n"+ " - ID: "+ busStopID)
                                     .icon(MFBitmapDescriptorFactory.fromResource(R.drawable.location))
-                                    .snippet("Tuyến: "+tuyenDuong));
+                                    .snippet("Tuyến: "+Route));
                             markersList.add(marker);
                         } catch (JSONException e){
                             e.printStackTrace();
                         }
+                        point = new LatLng(lat,lon);
 
                     }
                 }
@@ -308,8 +334,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-
-
+//    private void addCircleToMap(){
+//        circle = map4D.addCircle(new MFCircleOptions()
+//                .center()
+//                .radius(500)
+//                .fillColor("#00ff00")
+//                .fillAlpha(0.3f));
+//    }
     private void requestLocationPermission(String[] permission) {
         ActivityCompat.requestPermissions(this, permission, REQUEST_LOCATION_CODE);
     }
@@ -361,13 +392,86 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //            }
 //        });
         addPolyline();
+//        addCircleToMap();
         map4D.setOnMyLocationClickListener(new Map4D.OnMyLocationClickListener() {
             @Override
-            public void onMyLocationClick(Location location) {
-                Toast.makeText(getApplicationContext(), location.getLatitude()+"_"+location.getLongitude(), Toast.LENGTH_SHORT).show();
-            }
-        });
+            public void onMyLocationClick(final Location location) {
+                CountDownTimer uy = new CountDownTimer(86400000, 3000)
+                {
+                    public void onFinish()
+                    {
+                        Toast.makeText(getApplicationContext(),"finish",Toast.LENGTH_SHORT);
+                    }
 
+                    @Override
+                    public void onTick(long l) {
+                        final RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+                        final JsonArrayRequest jsonArrayRequest = new JsonArrayRequest("http://vbusapp.000webhostapp.com", new Response.Listener<JSONArray>() {
+                            @Override
+                            public void onResponse(JSONArray response) {
+                                if (response != null) {
+                                        try {
+                                            JSONObject jsonObject = response.getJSONObject(mang.length);
+                                            la1 = location.getLatitude();
+                                            lo1 = location.getLongitude();
+                                            la2 = jsonObject.getDouble("Lat");
+                                            lo2 = jsonObject.getDouble("Lon");
+                                            final String nameMarker = jsonObject.getString("Name");
+                                            String busStopID = jsonObject.getString("BusStopId");
+                                            String tuyenDuong = jsonObject.getString("PlaceNameFromName");
+
+                                            double R = 6371e3;
+                                            double dLat = (la2 - la1) * (Math.PI / 180);
+                                            double dLon = (lo2 - lo1) * (Math.PI / 180);
+                                            double la1ToRad = la1 * (Math.PI / 180);
+                                            double la2ToRad = la2 * (Math.PI / 180);
+                                            double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(la1ToRad)
+                                                    * Math.cos(la2ToRad) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                                            double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                                            kq = R * c;
+                                            kq *= 0.001;//đổi sang km
+
+                                            DecimalFormat precision = new DecimalFormat("0.00");//lấy 2 số thập phân
+                                            final String n = precision.format(kq);//chuyển kq về đạng chuỗi
+
+                                            Handler handler = new Handler();//sử dụng handler để delay mỗi 5s/1 lần
+                                            handler.postDelayed(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    textToSpeech= new TextToSpeech(MainActivity.this, new TextToSpeech.OnInitListener() {
+                                                        @Override
+                                                        public void onInit(int status) {
+                                                            if(status != TextToSpeech.ERROR) {
+                                                                textToSpeech.setLanguage(new Locale("vi"));
+                                                                textToSpeech.speak(text+"Khoảng cách từ bạn đến "+nameMarker+" là"+ n +" km" , TextToSpeech.QUEUE_FLUSH, null);
+                                                            }
+                                                        }
+                                                    });
+                                                }
+                                            },2000);
+
+
+                                            Toast.makeText(getApplicationContext(),"khoang cach la: " +kq ,Toast.LENGTH_SHORT).show();
+                                        } catch (JSONException e){
+                                            e.printStackTrace();
+                                        }
+
+
+                                }
+                            }
+
+                        }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+
+                            }
+                        });
+                        requestQueue.add(jsonArrayRequest);
+                    }
+                }.start();
+            }
+
+        });
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions

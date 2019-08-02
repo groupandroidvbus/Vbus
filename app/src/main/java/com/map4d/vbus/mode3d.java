@@ -1,4 +1,4 @@
-package com.example.loadmap4d;
+package com.map4d.vbus;
 
 import android.Manifest;
 import android.content.Intent;
