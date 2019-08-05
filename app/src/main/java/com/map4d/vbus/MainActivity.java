@@ -69,7 +69,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private MFPolyline polyline;
     private MFCircle circle;
     private TextToSpeech textToSpeech;
-    private String text = "Đụ mạ mày";
     private Double kq;
     private Double la1;
     private Double lo1;
@@ -443,7 +442,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                                         public void onInit(int status) {
                                                             if(status != TextToSpeech.ERROR) {
                                                                 textToSpeech.setLanguage(new Locale("vi"));
-                                                                textToSpeech.speak(text+"Khoảng cách từ bạn đến "+nameMarker+" là"+ n +" km" , TextToSpeech.QUEUE_FLUSH, null);
+                                                                textToSpeech.speak("Khoảng cách từ bạn đến "+nameMarker+" là"+ n +" km" , TextToSpeech.QUEUE_FLUSH, null);
                                                             }
                                                         }
                                                     });
