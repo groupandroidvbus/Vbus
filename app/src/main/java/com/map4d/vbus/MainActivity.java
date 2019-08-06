@@ -5,12 +5,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -23,6 +20,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.text.DecimalFormat;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -36,7 +34,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DecimalFormat;
+import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -58,21 +56,28 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private static final int REQUEST_LOCATION_CODE = 69;
     private Map4D map4D;
-    DecimalFormat decimalFormat = new DecimalFormat("0.000");
+
     Button viewMap3d;
+
+    double destance[] = new double[200];
+
     private  boolean defaultInfoWindow = true;
     private final List<MFMarker> markersList = new ArrayList<>();
+
     private List<LatLng> LatLngList = new ArrayList<>();
     private List<LatLng> LatLngNgaRe = new ArrayList<>();
-    private List<LatLng> LatLngNgaRe2 = new ArrayList<>();
     private MFPolyline polyline;
     private MFCircle circle;
-    private double[] khoangcach = new double[100];
-    TextToSpeech textToSpeech;
-    private LocationManager locationManager;
-    private LocationListener listener;
-
-
+    private TextToSpeech textToSpeech;
+    private Double kq;
+    private Double la1;
+    private Double lo1;
+    private Double la2;
+    private Double lo2;
+    private Double lat;
+    private Double lon;
+    private LatLng point;
+    private String[] mang = new String[200];
 
     class CustomInfoWindowAdapter implements Map4D.InfoWindowAdapter {
 
@@ -146,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-        //Location
+
     }
 
     @Override
@@ -202,13 +207,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         LatLngList.add(new LatLng(16.010588485555,108.25680757123));//34
         LatLngList.add(new LatLng(16.006919331911,108.258677822));//35
         LatLngList.add(new LatLng(16.002392,108.259765));//36
-        LatLngList.add(new LatLng(16.099081, 108.223968));//marker-gia lap
-        LatLngList.add(new LatLng(16.095989,108.224359));//marker - gia lap
-        LatLngList.add(new LatLng(16.093157, 108.225284));//marker - gia lap
-        LatLngList.add(new LatLng(16.090473,108.226853));//marker - gia lap
-        LatLngList.add(new LatLng(16.088133,108.229004));//marker - gia lap
 
-        //polylineFake
         LatLngNgaRe.add(new LatLng(16.056027725183,108.17246204884));//1
         LatLngNgaRe.add(new LatLng(16.057422,108.172358));
         LatLngNgaRe.add(new LatLng(16.059193410072,108.17493374949));//2
@@ -226,7 +225,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         LatLngNgaRe.add(new LatLng(16.077860,108.211913));//11
         LatLngNgaRe.add(new LatLng(16.074977,108.212494));//12
         LatLngNgaRe.add(new LatLng(16.072783,108.212912));//13
-        LatLngNgaRe.add(new LatLng(16.070238,108.213432));
+        LatLngNgaRe.add(new LatLng(16.070238,
+                108.213432));
         LatLngNgaRe.add(new LatLng(16.070504180136,108.2149773683));//14
         LatLngNgaRe.add(new LatLng(16.070580, 108.215064));
         LatLngNgaRe.add(new LatLng(16.068523946288,108.21556686227));//15
@@ -274,13 +274,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         LatLngNgaRe.add(new LatLng(16.002524, 108.259540));
         LatLngNgaRe.add(new LatLng(16.006919331911,108.258677822));//35
         LatLngNgaRe.add(new LatLng(16.002392,108.259765));//36
-
-        LatLngNgaRe2.add(new LatLng(16.099081, 108.223968));//marker
-        LatLngNgaRe2.add(new LatLng(16.095989,108.224359));//marker
-        LatLngNgaRe2.add(new LatLng(16.093157, 108.225284));//marker
-        LatLngNgaRe2.add(new LatLng(16.090473,108.226853));//marker
-        LatLngNgaRe2.add(new LatLng(16.088133,108.229004));//marker
     }
+
     //Marker
     private void addMarkersToMap() {
 //        int i=1;
@@ -288,34 +283,33 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //            MFMarker marker = map4D.addMarker(new MFMarkerOptions()
 //                    .position(latLng)
 //                    .title("Trạm: " + i++)
-//                    .icon(MFBitmapDescriptorFactory.fromResource(R.drawable.location))
-//                    .snippet(latLng.getLatitude() + ", " + latLng.getLongitude())
-//            );
+//                    .snippet(latLng.getLatitude() + ", " + latLng.getLongitude()));
 //            markersList.add(marker);
 //        }
         //Marker
         final RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest("https://vbusapp.000webhostapp.com/", new Response.Listener<JSONArray>() {
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest("https://vbusapp.000webhostapp.com", new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
                 if (response != null) {
                     for(int i = 0; i < response.length(); i++ ){
                         try {
                             JSONObject jsonObject = response.getJSONObject(i);
-                            double lat = jsonObject.getDouble("Lat");
-                            double lon = jsonObject.getDouble("Lon");
+                            lat = jsonObject.getDouble("Lat");
+                            lon = jsonObject.getDouble("Lon");
                             String nameMarker = jsonObject.getString("Name");
                             String busStopID = jsonObject.getString("BusStopId");
-                            String tuyenDuong = jsonObject.getString("PlaceNameFromName");
+                            String Route = jsonObject.getString("PlaceNameFromName");
                             MFMarker marker = map4D.addMarker(new MFMarkerOptions()
                                     .position(new LatLng(lat, lon ))
                                     .title("Tên trạm: " + nameMarker + "\n"+ " - ID: "+ busStopID)
                                     .icon(MFBitmapDescriptorFactory.fromResource(R.drawable.location))
-                                    .snippet("Tuyến: "+tuyenDuong));
+                                    .snippet("Tuyến: "+Route));
                             markersList.add(marker);
                         } catch (JSONException e){
                             e.printStackTrace();
                         }
+                        point = new LatLng(lat,lon);
 
                     }
                 }
@@ -330,7 +324,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
     //Marker
 
-    //Polyline
     private void addPolyline(){
         polyline = map4D.addPolyline(new MFPolylineOptions().add(LatLngNgaRe.toArray(new LatLng[LatLngNgaRe.size()]))
                 .color("#ff00")
@@ -339,28 +332,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .alpha(0.3f));
 
     }
-    private void addPolyline2(){
-        polyline = map4D.addPolyline(new MFPolylineOptions().add(LatLngNgaRe2.toArray(new LatLng[LatLngNgaRe2.size()]))
-                .color("#ff00")
-                .width(8)
-                .closed(false)
-                .alpha(0.3f));
 
-    }
-    //Polyline
-
-    //Circle
-    private void addCircleToMap() {
-        if (map4D != null) {
-            for(LatLng latlng: LatLngList)
-                circle = map4D.addCircle(new MFCircleOptions()
-                        .center(latlng)
-                        .radius(100)
-                        .fillColor("#00ff00")
-                        .fillAlpha(0.3f));
-        }
-    }
-
+//    private void addCircleToMap(){
+//        circle = map4D.addCircle(new MFCircleOptions()
+//                .center()
+//                .radius(500)
+//                .fillColor("#00ff00")
+//                .fillAlpha(0.3f));
+//    }
     private void requestLocationPermission(String[] permission) {
         ActivityCompat.requestPermissions(this, permission, REQUEST_LOCATION_CODE);
     }
@@ -397,102 +376,89 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-
     @Override
-    public void onMapReady(final Map4D map4D) {
+    public void onMapReady(Map4D map4D) {
         this.map4D = map4D;
         creatPath();
         addMarkersToMap();
-        addPolyline();
-        addPolyline2();
-        addCircleToMap();
+
         map4D.setInfoWindowAdapter(new CustomInfoWindowAdapter());
-
-        final LatLng target = map4D.getCameraPosition().getTarget();
-
-
-        //auto load my location
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        listener = new LocationListener() {
+//        map4D.setOnMyLocationButtonClickListener(new Map4D.OnMyLocationButtonClickListener() {
+//            @Override
+//            public boolean onMyLocationButtonClick() {
+//                Toast.makeText(getApplicationContext(), "My Location Button clicked", Toast.LENGTH_SHORT).show();
+//                return false;
+//            }
+//        });
+        addPolyline();
+//        addCircleToMap();
+        map4D.setOnMyLocationClickListener(new Map4D.OnMyLocationClickListener() {
             @Override
-            public void onLocationChanged(final Location location) {
-                CountDownTimer countDownTimer = new CountDownTimer(86400000,10000) {
+            public void onMyLocationClick(final Location location) {
+                CountDownTimer uy = new CountDownTimer(86400000, 3000)
+                {
+                    public void onFinish()
+                    {
+                        Toast.makeText(getApplicationContext(),"finish",Toast.LENGTH_SHORT);
+                    }
+
                     @Override
                     public void onTick(long l) {
-
                         final RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-                        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest("https://vbusapp.000webhostapp.com/", new Response.Listener<JSONArray>() {
+                        final JsonArrayRequest jsonArrayRequest = new JsonArrayRequest("http://vbusapp.000webhostapp.com", new Response.Listener<JSONArray>() {
                             @Override
                             public void onResponse(JSONArray response) {
                                 if (response != null) {
-                                    try {
-                                        for(int i = 0; i<response.length(); i++) {
-                                            JSONObject jsonObject = response.getJSONObject(i);
-                                            double lat2 = jsonObject.getDouble("Lat");
-                                            double lon2 = jsonObject.getDouble("Lon");
+                                        try {
+                                            JSONObject jsonObject = response.getJSONObject(mang.length);
+                                            la1 = location.getLatitude();
+                                            lo1 = location.getLongitude();
+                                            la2 = jsonObject.getDouble("Lat");
+                                            lo2 = jsonObject.getDouble("Lon");
                                             final String nameMarker = jsonObject.getString("Name");
                                             String busStopID = jsonObject.getString("BusStopId");
                                             String tuyenDuong = jsonObject.getString("PlaceNameFromName");
-                                            int id = jsonObject.getInt("id");
 
-                                            double lat1 = location.getLatitude();
-                                            double lon1 = location.getLongitude();
-                                            int R = 6371;
-                                            double P1 = Math.toRadians(lat1);
-                                            double N1 = Math.toRadians(lon1);
-                                            double P2 = Math.toRadians(lat2);
-                                            double N2 = Math.toRadians(lon2);
+                                            double R = 6371e3;
+                                            double dLat = (la2 - la1) * (Math.PI / 180);
+                                            double dLon = (lo2 - lo1) * (Math.PI / 180);
+                                            double la1ToRad = la1 * (Math.PI / 180);
+                                            double la2ToRad = la2 * (Math.PI / 180);
+                                            double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(la1ToRad)
+                                                    * Math.cos(la2ToRad) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                                            double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                                            kq = R * c;
+                                            kq *= 0.001;//đổi sang km
 
+                                            DecimalFormat precision = new DecimalFormat("0.00");//lấy 2 số thập phân
+                                            final String n = precision.format(kq);//chuyển kq về đạng chuỗi
 
-                                            double a = Math.cos(P1) *Math.cos(P2) * Math.sin((N2 - N1) / 2) * Math.sin((N2 - N1) / 2);
-                                            double b = (Math.sin((P2 - P1) / 2)) * (Math.sin((P2 - P1) / 2));
-                                            double c = Math.sqrt(a + b);
-                                            double d = 2*R*Math.asin(c);
-
-
-                                            double min = 4;
-                                            if(0.03 < d && d < min){
-                                                DecimalFormat precision = new DecimalFormat("0.000");//lấy 2 số thập phân
-                                                final String d2 = precision.format(d);//chuyển kq về đạng chuỗi
-                                                final String name = nameMarker;
-                                                new CountDownTimer(86400000, 10000) {
-                                                    public void onTick(long millisUntilFinished) {
-                                                        textToSpeech = new TextToSpeech(MainActivity.this, new TextToSpeech.OnInitListener() {
-                                                            @Override
-                                                            public void onInit(int status) {
-                                                                if (status != TextToSpeech.ERROR) {
-                                                                    textToSpeech.setLanguage(new Locale("vi"));
-                                                                    textToSpeech.speak("quý khách chú ý ,Sắp đến " +name, TextToSpeech.QUEUE_FLUSH, null);
-                                                                }
+                                            Handler handler = new Handler();//sử dụng handler để delay mỗi 5s/1 lần
+                                            handler.postDelayed(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    textToSpeech= new TextToSpeech(MainActivity.this, new TextToSpeech.OnInitListener() {
+                                                        @Override
+                                                        public void onInit(int status) {
+                                                            if(status != TextToSpeech.ERROR) {
+                                                                textToSpeech.setLanguage(new Locale("vi"));
+                                                                textToSpeech.speak("Khoảng cách từ bạn đến "+nameMarker+" là"+ n +" km" , TextToSpeech.QUEUE_FLUSH, null);
                                                             }
-                                                        });                                                    }
-
-                                                    public void onFinish() {
-                                                        Toast.makeText(getApplicationContext(), "Lỗi rồi nhé", Toast.LENGTH_SHORT).show();
-                                                    }
-                                                }.start();
-
-                                                Toast.makeText(getApplicationContext(), "Khoảng cách đến " + name + " là: " +d2 + " km", Toast.LENGTH_SHORT).show();
-                                            } else if (0 < d && d ==0.03){
-                                                DecimalFormat precision = new DecimalFormat("0.000");//lấy 2 số thập phân
-                                                final String d2 = precision.format(d);//chuyển kq về đạng chuỗi
-                                                final String name = nameMarker;
-                                                textToSpeech = new TextToSpeech(MainActivity.this, new TextToSpeech.OnInitListener() {
-                                                    @Override
-                                                    public void onInit(int status) {
-                                                        if (status != TextToSpeech.ERROR) {
-                                                            textToSpeech.setLanguage(new Locale("vi"));
-                                                            textToSpeech.speak("quý khách chú ý ,đã đến  " + name, TextToSpeech.QUEUE_FLUSH, null);
                                                         }
-                                                    }
-                                                });
-                                            }
+                                                    });
+                                                }
+                                            },2000);
+
+
+                                            Toast.makeText(getApplicationContext(),"khoang cach la: " +kq ,Toast.LENGTH_SHORT).show();
+                                        } catch (JSONException e){
+                                            e.printStackTrace();
                                         }
-                                    } catch (JSONException e){
-                                        e.printStackTrace();
-                                    }
+
+
                                 }
                             }
+
                         }, new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError error) {
@@ -501,32 +467,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         });
                         requestQueue.add(jsonArrayRequest);
                     }
-
-                    @Override
-                    public void onFinish() {
-
-                    }
-                };
-                countDownTimer.start();
+                }.start();
             }
 
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String s) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String s) {
-                Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(i);
-            }
-        };
-
+        });
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -537,34 +481,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        locationManager.requestLocationUpdates("gps", 4000, 0, listener);
-        configure_button();
-
-
-        //auto load my location
-
-        map4D.setOnMyLocationClickListener(new Map4D.OnMyLocationClickListener() {
-            @Override
-            public void onMyLocationClick(final Location location) {
-                Toast.makeText(getApplicationContext(), location.getLatitude()+"_"+location.getLongitude(), Toast.LENGTH_SHORT).show();
-
-            }
-        });
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            return;
-        }
-
         map4D.setMyLocationEnabled(true);
-    }
-    void configure_button() {
-        // first check for permissions
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET},10);
-            }
-            return;
-        }
     }
 }
