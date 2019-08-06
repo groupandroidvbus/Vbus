@@ -1,5 +1,5 @@
 package com.map4d.vbus;
-//bdbvdb
+////////////////
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
