@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">v-bus</string>
+    <string name="app_name">VBus</string>
     <string name="collections">Collections</string>
     <string name="explorer">Explorer</string>
     <string name="map2dDemo">Map 2D Demo</string>
