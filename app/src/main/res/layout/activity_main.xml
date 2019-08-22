@@ -1,23 +1,60 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:orientation="vertical"  >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Find path"
+            android:id="@+id/btnFindPath" />
+        <ImageView
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/road"/>
+        <TextView
+            android:layout_marginLeft="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0 km"
+            android:id="@+id/tvDistance" />
+
+        <ImageView
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="5dp"
+            android:src="@drawable/clock"/>
+        <TextView
+            android:layout_marginLeft="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0 min"
+            android:id="@+id/tvDuration" />
+        <Button
+            android:id="@+id/map3D"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3D MODE" />
+    </LinearLayout>
 
     <fragment
-        android:id="@+id/Map4D"
-        class="vn.map4d.map4dsdk.maps.MFSupportMapFragment"
+        android:id="@+id/map"
+        android:name="vn.map4d.map4dsdk.maps.MFSupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <Button
 
-        android:id="@+id/map3D"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="3D MODE" />
-
-
-</RelativeLayout>
+</LinearLayout>
